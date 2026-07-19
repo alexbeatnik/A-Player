@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 144 144" width="144" height="144">
+  <!--
+    Metrics inherited from the AV logo so the two marks read as one family:
+    144 canvas, glyph spanning y 17..128, stroke width 21, round caps and joins,
+    10 units of space between the letters.
+
+    A is the same crossbar-less Λ. P is a stem with a semicircular bowl whose
+    radius equals half the height of the upper section.
+  -->
+  <defs>
+    <linearGradient id="ap" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5E92F8" />
+      <stop offset="1" stop-color="#3568DE" />
+    </linearGradient>
+  </defs>
+
+  <g fill="none" stroke="url(#ap)" stroke-width="21" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 15 117.5 L 45.5 27.5 L 76 117.5" />
+    <path d="M 107 117.5 L 107 27.5 A 22 22 0 0 1 107 71.5" />
+  </g>
+</svg>

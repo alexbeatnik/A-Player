@@ -1,0 +1,41 @@
+{
+  "name": "a-player",
+  "version": "0.1.0",
+  "description": "Local offline audio player",
+  "main": "./out/main/index.js",
+  "type": "module",
+  "author": "Oleksii Poliakov",
+  "license": "Apache-2.0",
+  "private": true,
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "npm run typecheck && electron-vite build",
+    "preview": "electron-vite preview",
+    "typecheck": "tsc -p tsconfig.node.json --noEmit && tsc -p tsconfig.web.json --noEmit",
+    "icons": "electron scripts/make-icons.mjs",
+    "dist": "npm run build && electron-builder --win"
+  },
+  "dependencies": {
+    "music-metadata": "^11.14.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^5.2.0",
+    "electron": "^43.1.1",
+    "electron-builder": "^26.15.3",
+    "electron-vite": "^5.0.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.6",
+    "zustand": "^5.0.14"
+  },
+  "allowScripts": {
+    "electron@43.1.1": true,
+    "electron-winstaller@5.4.0": true,
+    "esbuild@0.25.12": true,
+    "esbuild@0.28.1": true
+  }
+}
