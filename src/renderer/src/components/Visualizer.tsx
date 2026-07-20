@@ -20,13 +20,27 @@ export function Visualizer({ mode, onCycleMode }: VisualizerProps): JSX.Element 
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    // The canvas is drawn in physical pixels, otherwise everything is blurry on HiDPI.
-    const dpr = window.devicePixelRatio || 1
-    const cssWidth = canvas.clientWidth
-    const cssHeight = canvas.clientHeight
-    canvas.width = Math.round(cssWidth * dpr)
-    canvas.height = Math.round(cssHeight * dpr)
-    ctx.scale(dpr, dpr)
+    // The canvas is drawn in physical pixels, otherwise everything is blurry on
+    // HiDPI. The window is resizable, so the backing store has to follow it —
+    // otherwise the picture stays stretched at whatever size it had on mount.
+    let cssWidth = 0
+    let cssHeight = 0
+
+    // An arrow function, not a declaration: hoisting would lose the null checks
+    // above and TypeScript would no longer see canvas/ctx as non-null.
+    const resize = (): void => {
+      cssWidth = canvas.clientWidth
+      cssHeight = canvas.clientHeight
+      const dpr = window.devicePixelRatio || 1
+      canvas.width = Math.round(cssWidth * dpr)
+      canvas.height = Math.round(cssHeight * dpr)
+      // Changing the backing size resets the context transform.
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+    }
+
+    resize()
+    const observer = new ResizeObserver(resize)
+    observer.observe(canvas)
 
     let frame = 0
     // Bars rise instantly but fall smoothly, which reads better than raw values.
@@ -96,7 +110,10 @@ export function Visualizer({ mode, onCycleMode }: VisualizerProps): JSX.Element 
     }
 
     draw()
-    return () => cancelAnimationFrame(frame)
+    return () => {
+      cancelAnimationFrame(frame)
+      observer.disconnect()
+    }
   }, [mode])
 
   return (

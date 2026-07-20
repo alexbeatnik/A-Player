@@ -1,0 +1,41 @@
+name: CI
+
+# Runs on every pull request and on everything that lands on main — merging a
+# PR is a push to main, so a merge is always checked even if the branch was
+# never opened as a PR.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# A new push supersedes whatever was still running for the same branch.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      # Neither the typecheck nor the tests touch the Electron binary — the
+      # tests mock the whole electron module — so skipping the ~100 MB download
+      # is safe and takes the bulk of the install time out of every run.
+      - name: Install dependencies
+        run: npm ci
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: 1
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test

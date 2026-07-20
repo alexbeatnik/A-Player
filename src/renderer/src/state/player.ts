@@ -45,6 +45,8 @@ interface PlayerState {
   /** Playback order in shuffle mode; empty when shuffle is off. */
   shuffleOrder: number[]
   settingsLoaded: boolean
+  /** Kept only so that saving settings does not wipe what was loaded. */
+  libraryFolders: string[]
 
   hydrate: () => Promise<void>
   addTracks: (tracks: Track[], replace?: boolean) => void
@@ -92,7 +94,7 @@ function persist(state: PlayerState): void {
       equalizer: state.equalizer,
       playlist: state.tracks.map((track) => track.path),
       currentIndex: state.currentIndex,
-      libraryFolders: []
+      libraryFolders: state.libraryFolders
     }
     void window.aplayer.saveSettings(settings)
   }, 400)
@@ -115,6 +117,7 @@ export const usePlayer = create<PlayerState>((set, get) => ({
 
   shuffleOrder: [],
   settingsLoaded: false,
+  libraryFolders: [],
 
   hydrate: async () => {
     const settings = await window.aplayer.loadSettings()
@@ -147,6 +150,7 @@ export const usePlayer = create<PlayerState>((set, get) => ({
       equalizer: settings.equalizer,
       shuffleOrder: settings.shuffle ? shuffled(tracks.length, currentIndex) : [],
       duration: currentIndex >= 0 ? tracks[currentIndex].duration : 0,
+      libraryFolders: settings.libraryFolders,
       settingsLoaded: true
     })
 
@@ -201,7 +205,11 @@ export const usePlayer = create<PlayerState>((set, get) => ({
       currentIndex,
       selected: new Set<number>(),
       isPlaying: currentIndex === -1 ? false : state.isPlaying,
-      shuffleOrder: state.shuffle ? shuffled(tracks.length, currentIndex >= 0 ? currentIndex : null) : []
+      currentTime: currentIndex === -1 ? 0 : state.currentTime,
+      duration: currentIndex === -1 ? 0 : state.duration,
+      shuffleOrder: state.shuffle
+        ? shuffled(tracks.length, currentIndex >= 0 ? currentIndex : null)
+        : []
     })
     persist(get())
   },
@@ -270,7 +278,12 @@ export const usePlayer = create<PlayerState>((set, get) => ({
     // should genuinely change track.
     if (auto && state.repeat === 'one') {
       engine.seek(0)
-      await engine.play()
+      set({ currentTime: 0 })
+      try {
+        await engine.play()
+      } catch {
+        set({ isPlaying: false })
+      }
       return
     }
 
