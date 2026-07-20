@@ -86,7 +86,13 @@ export function handleAppProtocol(rendererRoot: string): void {
     }
 
     const relative = url.pathname === '/' ? 'index.html' : url.pathname.slice(1)
-    const target = normalize(join(root, decodeURIComponent(relative)))
+    let decoded: string
+    try {
+      decoded = decodeURIComponent(relative)
+    } catch {
+      return new Response('Bad request', { status: 400 })
+    }
+    const target = normalize(join(root, decoded))
 
     // Guard against escaping the renderer directory via "..".
     if (target !== root && !target.startsWith(root + sep)) {

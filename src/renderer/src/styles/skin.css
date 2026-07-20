@@ -524,6 +524,9 @@ body {
   overflow-y: auto;
   list-style: none;
   background: var(--bg-sunken);
+  /* Makes the list the offset parent of its rows, so that scrolling to the
+     playing track can be computed from item.offsetTop. */
+  position: relative;
 }
 
 .playlist__empty {
@@ -550,6 +553,7 @@ body {
   align-items: baseline;
   gap: 6px;
   padding: 3px 7px;
+  border-left: 2px solid transparent;
   font-family: var(--font-lcd);
   font-size: 11px;
   color: var(--text);
@@ -569,8 +573,12 @@ body {
   background: var(--selected);
 }
 
+/* The list scrolls to this row on every track change, so it has to be findable
+   at a glance and not just a shade of text colour. */
 .playlist__item.is-current {
   color: var(--lcd);
+  border-left-color: var(--lcd);
+  background: rgb(60 232 122 / 8%);
 }
 
 .playlist__item.is-current.is-selected {

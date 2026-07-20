@@ -22,5 +22,10 @@ export function fromMediaPath(pathname: string): string | null {
   if (!pathname.startsWith(MEDIA_PREFIX)) return null
   const encoded = pathname.slice(MEDIA_PREFIX.length)
   if (encoded.length === 0) return null
-  return decodeURIComponent(encoded)
+  try {
+    return decodeURIComponent(encoded)
+  } catch {
+    // A malformed escape sequence must not take down the request handler.
+    return null
+  }
 }

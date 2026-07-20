@@ -1,4 +1,4 @@
-import { useRef, type JSX, type MouseEvent } from 'react'
+import { useEffect, useRef, type JSX, type MouseEvent } from 'react'
 import type { Track } from '@shared/types'
 import { formatTime, formatTotalTime, trackLabel } from '@/utils/format'
 
@@ -31,8 +31,33 @@ export function Playlist({
 }: PlaylistProps): JSX.Element {
   // Anchor for Shift range selection.
   const anchorRef = useRef<number | null>(null)
+  const listRef = useRef<HTMLOListElement>(null)
+  const currentRef = useRef<HTMLLIElement>(null)
 
   const totalDuration = tracks.reduce((sum, track) => sum + track.duration, 0)
+
+  /**
+   * Keep the playing track in view. It matters most with shuffle on: the next
+   * track can be anywhere in the list, so otherwise the highlight simply
+   * disappears off-screen and the list stops showing what is playing.
+   *
+   * Only the list itself is scrolled — scrollIntoView would also move any
+   * scrollable ancestor.
+   */
+  useEffect(() => {
+    const list = listRef.current
+    const item = currentRef.current
+    if (!list || !item) return
+
+    const top = item.offsetTop
+    const bottom = top + item.offsetHeight
+
+    if (top < list.scrollTop) {
+      list.scrollTo({ top, behavior: 'smooth' })
+    } else if (bottom > list.scrollTop + list.clientHeight) {
+      list.scrollTo({ top: bottom - list.clientHeight, behavior: 'smooth' })
+    }
+  }, [currentIndex, tracks])
 
   function handleClick(event: MouseEvent<HTMLLIElement>, index: number): void {
     if (event.shiftKey && anchorRef.current !== null) {
@@ -120,10 +145,11 @@ export function Playlist({
           <span>supported: mp3, wav, flac, ogg, opus, m4a, aac</span>
         </div>
       ) : (
-        <ol className="playlist__list">
+        <ol className="playlist__list" ref={listRef}>
           {tracks.map((track, index) => (
             <li
               key={track.path}
+              ref={index === currentIndex ? currentRef : null}
               className={[
                 'playlist__item',
                 index === currentIndex ? 'is-current' : '',

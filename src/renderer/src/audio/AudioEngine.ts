@@ -22,6 +22,10 @@ export class AudioEngine {
   private eqEnabled = false
   private eqBands: number[] = new Array(EQ_FREQUENCIES.length).fill(0)
   private eqPreamp = 0
+  // Volume and balance are stored rather than written straight to the graph:
+  // they are set at startup, long before the first user gesture creates it.
+  private volume = 1
+  private balance = 0
 
   constructor() {
     this.element = new Audio()
@@ -86,6 +90,8 @@ export class AudioEngine {
     this.analyserNode = analyser
 
     this.applyEqualizer()
+    this.applyVolume()
+    this.applyBalance()
   }
 
   get analyser(): AnalyserNode | null {
@@ -128,12 +134,20 @@ export class AudioEngine {
 
   /** 0…1 */
   setVolume(value: number): void {
-    const clamped = Math.max(0, Math.min(1, value))
+    this.volume = Math.max(0, Math.min(1, value))
+    this.applyVolume()
+  }
+
+  private applyVolume(): void {
     // Hearing is logarithmic: a linear slider would sound as if all the volume
     // were crammed into the top quarter of its travel.
-    const curved = clamped * clamped
+    const curved = this.volume * this.volume
     if (this.gainNode) {
       this.gainNode.gain.value = curved
+      // The element itself must stay at unity, otherwise its volume multiplies
+      // with the gain node and everything set before the graph existed is
+      // attenuated twice.
+      this.element.volume = 1
     } else {
       this.element.volume = curved
     }
@@ -141,9 +155,12 @@ export class AudioEngine {
 
   /** -1 (left) … +1 (right) */
   setBalance(value: number): void {
-    if (this.pannerNode) {
-      this.pannerNode.pan.value = Math.max(-1, Math.min(1, value))
-    }
+    this.balance = Math.max(-1, Math.min(1, value))
+    this.applyBalance()
+  }
+
+  private applyBalance(): void {
+    if (this.pannerNode) this.pannerNode.pan.value = this.balance
   }
 
   setEqualizerEnabled(enabled: boolean): void {

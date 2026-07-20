@@ -1,6 +1,6 @@
 {
   "name": "a-player",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Local offline audio player",
   "main": "./out/main/index.js",
   "type": "module",
