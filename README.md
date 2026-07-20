@@ -62,6 +62,25 @@ npm run icons      # regenerate build/icon.ico from build/logo.svg
 npm run dist       # installer and portable exe into release/
 ```
 
+## Tests
+
+```bash
+npm test           # run once
+npm run test:watch # re-run on change
+npm run typecheck  # all three tsconfig projects, tests included
+```
+
+Unit tests cover the pure logic on both sides of the process boundary: Range
+header and MIME handling for the media protocol, the `/media/` URL round trip,
+settings validation, time formatting, and the player store — track order,
+shuffle, repeat modes, playlist editing and session restore. The Web Audio
+engine is mocked, so no audio device or real file is needed and the suite runs
+in about a second.
+
+[.github/workflows/ci.yml](.github/workflows/ci.yml) runs the typecheck and the
+tests on every pull request and on every push to `main`, so anything merged is
+checked.
+
 ## Release
 
 Building and publishing is handled by [.github/workflows/release.yml](.github/workflows/release.yml)

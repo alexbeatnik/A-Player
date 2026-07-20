@@ -26,7 +26,7 @@ function strings(value: unknown): string[] {
  * it (`playlist.length` on a non-array), leaving the player unusable until the
  * file was deleted by hand.
  */
-function normalise(raw: unknown): Settings {
+export function normalise(raw: unknown): Settings {
   const parsed = (typeof raw === 'object' && raw !== null ? raw : {}) as Partial<Settings>
   const equalizer = (
     typeof parsed.equalizer === 'object' && parsed.equalizer !== null ? parsed.equalizer : {}

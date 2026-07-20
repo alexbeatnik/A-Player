@@ -74,6 +74,12 @@ jobs:
         if: steps.check.outputs.skip == 'false'
         run: npm run typecheck
 
+      # CI already ran these on the merge, but a release is also triggered by
+      # hand via workflow_dispatch — a broken build must not reach a tag.
+      - name: Test
+        if: steps.check.outputs.skip == 'false'
+        run: npm test
+
       - name: Build
         if: steps.check.outputs.skip == 'false'
         run: npx electron-vite build
