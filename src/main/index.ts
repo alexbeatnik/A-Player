@@ -21,8 +21,11 @@ function createWindow(): void {
   mainWindow = new BrowserWindow({
     width: 420,
     height: 640,
-    minWidth: 380,
-    minHeight: 260,
+    // The player has a fixed layout, so the window is a fixed size: no resizing,
+    // no maximise, no fullscreen.
+    resizable: false,
+    maximizable: false,
+    fullscreenable: false,
     show: false,
     frame: false,
     backgroundColor: '#12161c',
