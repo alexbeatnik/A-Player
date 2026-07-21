@@ -21,8 +21,6 @@ const api = {
 
   minimize: (): Promise<void> => ipcRenderer.invoke('window:minimize'),
   close: (): Promise<void> => ipcRenderer.invoke('window:close'),
-  setSize: (width: number, height: number): Promise<void> =>
-    ipcRenderer.invoke('window:setSize', width, height),
 
   /**
    * File.path was removed in Electron 32 — this is the only supported way to

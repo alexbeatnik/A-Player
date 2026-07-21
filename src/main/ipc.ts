@@ -113,10 +113,4 @@ export function registerIpcHandlers(): void {
   ipcMain.handle('window:close', (event): void => {
     windowFor(event)?.close()
   })
-
-  ipcMain.handle('window:setSize', (event, width: number, height: number): void => {
-    const win = windowFor(event)
-    if (!win) return
-    win.setContentSize(Math.round(width), Math.round(height), false)
-  })
 }
